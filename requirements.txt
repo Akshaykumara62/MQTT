@@ -1,0 +1,4 @@
+paho-mqtt
+pymongo
+paho-mqtt pymongo
+fastapi uvicorn

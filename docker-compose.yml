@@ -1,0 +1,49 @@
+version: '3'
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile.fastapi
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - mongodb
+    networks:
+      - mynetwork
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGODB_URI=mongodb://mongodb:27017/mydb  # Adjust the MongoDB URI as needed
+
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - mynetwork
+
+  mqtt-subscriber:
+    build:
+      context: .
+      dockerfile: Dockerfile.mqtt-subscriber
+    depends_on:
+      - redis
+      - fastapi
+    networks:
+      - mynetwork
+    environment:
+      - MQTT_BROKER=your_broker_address
+      - MQTT_TOPICS=sensors/temperature,sensors/humidity
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
